@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -16,7 +15,7 @@ import org.apache.log4j.Logger;
  * @author ilushechkinea
  */
 public class Formatter {
-    private Logger log = Logger.getLogger(Formatter.class);
+    static private Logger log = Logger.getLogger(Formatter.class);
     
     private InputStreamReader input;
     private OutputStreamWriter output;
@@ -146,7 +145,6 @@ public class Formatter {
     private void applySettings() {
         indentSymbol = settings.getValue(FormatterProperties.INDENT_SYMBOL);
         indentSize = Integer.valueOf(settings.getValue(FormatterProperties.INDENT_SIZE));
-        log.setLevel(Level.toLevel(settings.getValue(FormatterProperties.LOGGING_LEVEL)));
     }
     
     private String formIndent(int n) {
