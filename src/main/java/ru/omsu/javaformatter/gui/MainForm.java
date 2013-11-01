@@ -260,6 +260,9 @@ public class MainForm extends javax.swing.JFrame {
             out = new FileOutputStream(outputFileTextField.getText());
             formatter.format(in, out);
             out.close();
+            for (String warning : formatter.getWarnings()) {
+                log.warn("Formatting warning: " + warning);
+            }            
         }
         catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(this, "File not found", "Warning", WARNING_MESSAGE);
@@ -287,6 +290,9 @@ public class MainForm extends javax.swing.JFrame {
             formatter.format(in, out);
             out.close();
             codeTextArea.setText(out.toString());
+            for (String warning : formatter.getWarnings()) {
+                log.warn("Formatting warning: " + warning);
+            }  
         }
         catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(this, "File not found", "Warning", WARNING_MESSAGE);
