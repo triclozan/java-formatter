@@ -40,7 +40,7 @@ public class MainForm extends javax.swing.JFrame {
             log.error(null, ex);
         }
         formatter = new Formatter(settings);
-        
+        log.info("******Application started******");
     }
 
     /**
