@@ -24,7 +24,7 @@ import ru.omsu.util.StringInputStream;
  * @author ilushechkinea
  */
 public class MainForm extends javax.swing.JFrame {
-    static private Logger log = Logger.getLogger(Formatter.class);
+    static private Logger log = Logger.getRootLogger();
     private Formatter formatter;
     /**
      * Creates new form MainForm

@@ -12,7 +12,8 @@ import java.util.Properties;
  */
  public enum FormatterProperties {
     INDENT_SIZE("formatter.indent.size", "4"), 
-    INDENT_SYMBOL("formatter.indent.symbol", " "); 
+    INDENT_SYMBOL("formatter.indent.symbol", " "),
+    LOGGING_LEVEL("formatter.logging.level", "INFO"); 
     private String name;
     private String defaultValue;
 
