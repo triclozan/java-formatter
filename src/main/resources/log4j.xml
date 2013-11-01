@@ -10,18 +10,27 @@
     </appender>  
     <appender name="file" class="org.apache.log4j.FileAppender">
         <param name="file" value="log/application.log" />
-        <!--<param name="append" value="false" />-->
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%p %c: %m%n"/>
+            <param name="ConversionPattern" value="[%d{HH:mm:ss,SSS}] %p %c: %m%n"/>
+        </layout>
+    </appender>   
+    <appender name="file2" class="org.apache.log4j.FileAppender">
+        <param name="file" value="log/application.log" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%p: %m%n"/>
         </layout>
     </appender>   
     <!--Корневой logger-->
-    <logger name="ru.omsu.javaformatter.Formatter">
-        <level value="debug" />
-        <appender-ref ref="file" />
-    </logger>
-    <root>
+    <!--<root>
         <priority value="info"/>
         <appender-ref ref="console"/>
-    </root>
+        <appender-ref ref="file"/>
+    </root>-->
+    <logger name="ru.omsu.javaformatter.Formatter">
+        <appender-ref ref="file2"/>
+    </logger>
+    <logger name="ru.omsu.javaformatter.gui.MainForm">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </logger>
 </log4j:configuration>

@@ -24,12 +24,13 @@ import ru.omsu.util.StringInputStream;
  * @author ilushechkinea
  */
 public class MainForm extends javax.swing.JFrame {
-    static private Logger log = Logger.getRootLogger();
+    static private Logger log = Logger.getLogger(MainForm.class);
     private Formatter formatter;
     /**
      * Creates new form MainForm
      */
     public MainForm() {
+        log.info("******Application started******");
         initComponents();
         FormatterSettings settings = new FormatterSettings();
         try {
@@ -37,10 +38,9 @@ public class MainForm extends javax.swing.JFrame {
         }
         catch(Exception ex) {
             JOptionPane.showMessageDialog(this, "Couldn't load settings from file, using default settings", "Warning", WARNING_MESSAGE);
-            log.error(null, ex);
+            log.warn(null, ex);
         }
-        formatter = new Formatter(settings);
-        log.info("******Application started******");
+        formatter = new Formatter(settings);        
     }
 
     /**
@@ -253,6 +253,8 @@ public class MainForm extends javax.swing.JFrame {
     private void fileProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileProcessButtonActionPerformed
         FileInputStream in;
         FileOutputStream out;
+        
+        log.info("******Formatting a file*****");
         try {
             in = new FileInputStream(inputFileTextField.getText());
             out = new FileOutputStream(outputFileTextField.getText());
@@ -277,6 +279,8 @@ public class MainForm extends javax.swing.JFrame {
     private void stringProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stringProcessButtonActionPerformed
         StringInputStream in;
         ByteArrayOutputStream out;
+        
+        log.info("******Formatting a string*****");
         try {
             in = new StringInputStream(codeTextArea.getText());
             out = new ByteArrayOutputStream();            
