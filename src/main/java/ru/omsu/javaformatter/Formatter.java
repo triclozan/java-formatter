@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -24,11 +26,16 @@ public class Formatter {
     private int indentSize;
     private String indentSymbol;
     private int indent;
+    private int rightBraceMismatches;
     private States state;
+    private List<String> warnings;
     
     final String PTN_COMMENT = "(//.*)$";
     final String PTN_LARGE_COMMENT = "/*[^*]**/$";
     final String PTN_ID = "[]";
+    
+    final String WRN_LEFT_BRACE = "Left brace mismatch";
+    final String WRN_RIGHT_BRACE = "Right brace mismatch";
     
     final int BUFFER_SIZE = 4096;
     final String newLine = "\n";
@@ -40,10 +47,12 @@ public class Formatter {
     
     public Formatter() {
         setSettings(new FormatterSettings());
+        warnings = new LinkedList<String>();
     }
         
     public Formatter(FormatterSettings settings) {
         setSettings(settings);
+        warnings = new LinkedList<String>();
     }
       
     public void format(InputStream input, OutputStream output) throws IOException {
@@ -51,6 +60,9 @@ public class Formatter {
         
         InputStreamReader inputReader = new InputStreamReader(input);        
         OutputStreamWriter outputWriter = new OutputStreamWriter(output);
+        
+        rightBraceMismatches = 0;
+        warnings.clear();
 
         indent = 0;
         state = States.STRING_START;
@@ -125,8 +137,23 @@ public class Formatter {
             }
         } 
         outputWriter.flush();
+        
+        if (rightBraceMismatches > 0) {
+            addWarning(WRN_RIGHT_BRACE, rightBraceMismatches);
+        }
+        if (indent > 0) {
+            addWarning(WRN_LEFT_BRACE, indent);
+        }
         log.debug("finished formatting");
     }  
+  
+    public List<String> getWarnings() {
+        return warnings;
+    }    
+    
+    private void addWarning(String warning, int count) {
+        warnings.add(warning + " x" + Integer.toString(count));
+    }    
     
     private void increaseIndent() {
         indent++;
@@ -135,6 +162,10 @@ public class Formatter {
 
     private void decreaseIndent() {
         indent--;
+        if (indent < 0) {
+            indent = 0;
+            rightBraceMismatches++;
+        }
         log.trace("indent decreased to " + Integer.toString(indent));
     }    
 
@@ -153,31 +184,3 @@ public class Formatter {
         return new String(new char[n * indentSize]).replace("\0", indentSymbol);
     }
 }
-
-/*
-В любой строке сначала пропускаются все незначащие(пробельные) символы, 
-* затем если встречена закрывающая скобка, 
-*   отступ уменьшается на 1, делается отступ, пропускаются все символы до значащего или конца строки, делается перевод строки, все заново
-* иначе делается отступ, печатаются символы до перевода строки или открывающей скобки включительно
-* если перевод строки, все заново
-* иначе пропускаются все символы до значащего или конца строки, если конец строки, то 
-* затем все символы печатаются вплоть до 
-* 
-* ТОКЕНЫ:
-* 1. комментарий многострочный
-* 2. комментарий однострочный
-* 3. скобка открывающая
-* 4. скобка закрывающая
-* 5. перевод строки
-* 6. значащая строчка
-* 7. литерал строковый
-* 8. литерал символьный
-* 9. пробел (последовательность проблельных символов)
-* 
-* в начале строки пробелы вырезаются и заменяются на соотв. отступ
-* перед откр. скобкой пробелы заменяются на один символ пробела
- */
-
-/*
- комментарий, перевод, строчка, перевод, строчка, перевод, строчка, перевод, строчка, перевод, комментарий, перевод, строчка, скобка, перевод, строчка, перевод, строчка, перевод, перевод, 
- */
