@@ -18,6 +18,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import org.apache.log4j.Logger;
 import ru.omsu.ilushechkinea.javaformatter.Formatter;
 import ru.omsu.ilushechkinea.javaformatter.FormatterSettings;
+import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
 import ru.omsu.ilushechkinea.util.StringInputStream;
 
 /**
@@ -278,7 +279,7 @@ public class MainForm extends javax.swing.JFrame {
             
             formatter.format(in, out);
             out.close();
-            for (String warning : formatter.getWarnings()) {
+            for (FormatterWarningInfo warning : formatter.getWarnings()) {
                 log.warn("Formatting warning: " + warning);
             }            
         }
@@ -304,7 +305,7 @@ public class MainForm extends javax.swing.JFrame {
             formatter.format(in, out);
             out.close();
             codeTextArea.setText(out.toString());
-            for (String warning : formatter.getWarnings()) {
+            for (FormatterWarningInfo warning : formatter.getWarnings()) {
                 log.warn("Formatting warning: " + warning);
             }  
         }
