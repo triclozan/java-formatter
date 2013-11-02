@@ -27,8 +27,10 @@ public class Formatter {
     private String indentSymbol;
     private int indent;
     private int rightBraceMismatches;
+    private int row;
+    private int column;
     private FormatterStates state;
-    private List<String> warnings;
+    private List<FormatterWarningInfo> warnings;
     
     final String PTN_COMMENT = "(//.*)$";
     final String PTN_LARGE_COMMENT = "/*[^*]**/$";
@@ -47,12 +49,12 @@ public class Formatter {
     
     public Formatter() {
         setSettings(new FormatterSettings());
-        warnings = new LinkedList<String>();
+        warnings = new LinkedList<FormatterWarningInfo>();
     }
         
     public Formatter(FormatterSettings settings) {
         setSettings(settings);
-        warnings = new LinkedList<String>();
+        warnings = new LinkedList<FormatterWarningInfo>();
     }
       
     public void format(InputStream input, OutputStream output) throws IOException {
@@ -65,6 +67,8 @@ public class Formatter {
         warnings.clear();
 
         indent = 0;
+        row = 0;
+        column = 0;
         state = FormatterStates.STRING_START;
         char[] buffer = new char[BUFFER_SIZE];
         int bytesRead = 0;
@@ -79,6 +83,7 @@ public class Formatter {
                         if (c == '\n') {
                             outputWriter.write(formIndent(indent));
                             outputWriter.write(newLine);
+                            row++;
                         }
                         else if (!Character.isWhitespace(c)) {
                             if (c == '}') {
@@ -104,23 +109,27 @@ public class Formatter {
                         if (c == '\n') {
                             outputWriter.write(newLine);
                             moveToState(FormatterStates.STRING_START);
+                            row++;
                         }
                         else if (!Character.isWhitespace(c)) {
                             outputWriter.write(newLine);
                             moveToState(FormatterStates.STRING_START);
                             ptr--;
+                            column--;
                         }
                         break;
                     case NORMAL:
                         if (c == '\n') {
                             outputWriter.write(newLine);
                             moveToState(FormatterStates.STRING_START);
+                            row++;
                         }
                         else {
                             if (c == '}') {
                                 outputWriter.write(newLine);
                                 moveToState(FormatterStates.STRING_START);
                                 ptr--;
+                                column--;
                             }
                             else if (c == '{') {
                                 outputWriter.write(c);
@@ -134,25 +143,26 @@ public class Formatter {
                         break;
                 }
                 ptr++;
+                column++;
             }
         } 
         outputWriter.flush();
         
         if (rightBraceMismatches > 0) {
-            addWarning(WRN_RIGHT_BRACE, rightBraceMismatches);
+            addWarning(FormatterWarnings.WRN_RIGHT_BRACE, rightBraceMismatches);
         }
         if (indent > 0) {
-            addWarning(WRN_LEFT_BRACE, indent);
+            addWarning(FormatterWarnings.WRN_LEFT_BRACE, indent);
         }
         log.debug("finished formatting");
     }  
   
-    public List<String> getWarnings() {
+    public List<FormatterWarningInfo> getWarnings() {
         return warnings;
     }    
     
-    private void addWarning(String warning, int count) {
-        warnings.add(warning + " x" + Integer.toString(count));
+    private void addWarning(FormatterWarnings warning, int count) {
+        warnings.add(new FormatterWarningInfo(warning, count, -1, -1));
     }    
     
     private void increaseIndent() {

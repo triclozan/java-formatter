@@ -12,7 +12,17 @@ package ru.omsu.ilushechkinea.javaformatter;
 public class FormatterWarningInfo {
     private FormatterWarnings warning;
     private int count;
-
+    private int row;
+    private int column;
+    
+    public FormatterWarningInfo(FormatterWarnings warning, int count, int row,
+                                int column) {
+        this.warning = warning;
+        this.column = column;
+        this.row = row;
+        this.count = count;
+    }
+    
     /**
      * @return the warning
      */
@@ -44,8 +54,11 @@ public class FormatterWarningInfo {
     /**
      * @return warning information as a single String
      */
-    public String getInfo() {
-        return warning + " x" + Integer.toString(count);
+    @Override
+    public String toString() {
+        return warning + 
+               (count > 1 ? " x" + Integer.toString(count) : "") + 
+               (row >= 0 && column >= 0 ? "[row: " + row + ", column: " + column + "]" : "");
     }
 
     /**
