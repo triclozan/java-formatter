@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.omsu.javaformatter;
+package ru.omsu.ilushechkinea.javaformatter;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

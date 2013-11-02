@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.omsu.javaformatter.gui;
+package ru.omsu.ilushechkinea.javaformatter.gui;
 
 import java.awt.event.WindowEvent;
 import javax.swing.JFileChooser;
@@ -16,9 +16,9 @@ import java.io.ByteArrayOutputStream;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import org.apache.log4j.Logger;
-import ru.omsu.javaformatter.Formatter;
-import ru.omsu.javaformatter.FormatterSettings;
-import ru.omsu.util.StringInputStream;
+import ru.omsu.ilushechkinea.javaformatter.Formatter;
+import ru.omsu.ilushechkinea.javaformatter.FormatterSettings;
+import ru.omsu.ilushechkinea.util.StringInputStream;
 
 /**
  *

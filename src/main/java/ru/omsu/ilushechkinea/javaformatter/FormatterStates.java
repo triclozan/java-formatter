@@ -2,19 +2,19 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package ru.omsu.javaformatter;
+package ru.omsu.ilushechkinea.javaformatter;
 
 /**
  *
  * @author ilushechkinea
  */
-public enum FormatterWarnings {
-    WRN_RIGHT_BRACE("Right brace mismatch"), 
-    WRN_LEFT_BRACE("Left brace mismatch"); 
+public enum FormatterStates {
+    STRING_START("[Start of a line]"), 
+    AFTER_BRACE("[After a brace]"),
+    NORMAL("[Normal copying]"); 
     private String name;
 
-    private FormatterWarnings(String name) {
+    private FormatterStates(String name) {
         this.name = name;
     }
 

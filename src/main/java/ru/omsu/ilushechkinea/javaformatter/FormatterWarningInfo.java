@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package ru.omsu.javaformatter;
+package ru.omsu.ilushechkinea.javaformatter;
 
 /**
  *

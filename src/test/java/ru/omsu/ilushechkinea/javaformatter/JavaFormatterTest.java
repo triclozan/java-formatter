@@ -1,12 +1,12 @@
-package ru.omsu.javaformatter;
+package ru.omsu.ilushechkinea.javaformatter;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
-import ru.omsu.javaformatter.Formatter;
-import ru.omsu.util.StringInputStream;
+import ru.omsu.ilushechkinea.javaformatter.Formatter;
+import ru.omsu.ilushechkinea.util.StringInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
