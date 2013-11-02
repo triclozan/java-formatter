@@ -27,7 +27,7 @@ public class Formatter {
     private String indentSymbol;
     private int indent;
     private int rightBraceMismatches;
-    private States state;
+    private FormatterStates state;
     private List<String> warnings;
     
     final String PTN_COMMENT = "(//.*)$";
@@ -65,7 +65,7 @@ public class Formatter {
         warnings.clear();
 
         indent = 0;
-        state = States.STRING_START;
+        state = FormatterStates.STRING_START;
         char[] buffer = new char[BUFFER_SIZE];
         int bytesRead = 0;
         
@@ -93,39 +93,39 @@ public class Formatter {
                             }
                             
                             if (c == '{' || c == '}') {
-                                moveToState(States.AFTER_BRACE);  
+                                moveToState(FormatterStates.AFTER_BRACE);  
                             }
                             else {
-                                moveToState(States.NORMAL);    
+                                moveToState(FormatterStates.NORMAL);    
                             }
                         }
                         break;
                     case AFTER_BRACE:
                         if (c == '\n') {
                             outputWriter.write(newLine);
-                            moveToState(States.STRING_START);
+                            moveToState(FormatterStates.STRING_START);
                         }
                         else if (!Character.isWhitespace(c)) {
                             outputWriter.write(newLine);
-                            moveToState(States.STRING_START);
+                            moveToState(FormatterStates.STRING_START);
                             ptr--;
                         }
                         break;
                     case NORMAL:
                         if (c == '\n') {
                             outputWriter.write(newLine);
-                            moveToState(States.STRING_START);
+                            moveToState(FormatterStates.STRING_START);
                         }
                         else {
                             if (c == '}') {
                                 outputWriter.write(newLine);
-                                moveToState(States.STRING_START);
+                                moveToState(FormatterStates.STRING_START);
                                 ptr--;
                             }
                             else if (c == '{') {
                                 outputWriter.write(c);
                                 increaseIndent();
-                                moveToState(States.AFTER_BRACE);
+                                moveToState(FormatterStates.AFTER_BRACE);
                             }
                             else {
                                 outputWriter.write(c);
@@ -169,7 +169,7 @@ public class Formatter {
         log.trace("indent decreased to " + Integer.toString(indent));
     }    
 
-    private void moveToState(States state) {
+    private void moveToState(FormatterStates state) {
         this.state = state;
         log.trace("state changed to " + state.getName());
     }    
