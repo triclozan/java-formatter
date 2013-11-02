@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
 import ru.omsu.ilushechkinea.javaformatter.Formatter;
+import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
+import ru.omsu.ilushechkinea.javaformatter.FormatterWarnings;
 import ru.omsu.ilushechkinea.util.StringInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,7 +57,15 @@ public class JavaFormatterTest {
                 + "}"; 
         baos.reset();
         f.format(new StringInputStream(test2), baos);
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, "\n" + baos.toString());
         assertEquals(baos.toString(), res1);
+        
+        String test3 = "{}}{{"; 
+        baos.reset();
+        f.format(new StringInputStream(test3), baos);
+        FormatterWarningInfo wi = new FormatterWarningInfo(FormatterWarnings.WRN_LEFT_BRACE, 2, -1, -1);
+        FormatterWarningInfo wi2 = new FormatterWarningInfo(FormatterWarnings.WRN_RIGHT_BRACE, 1, -1, -1);
+        assertEquals(f.getWarnings().contains(wi), true);
+        assertEquals(f.getWarnings().contains(wi2), true);
+        assertEquals(f.getWarnings().size(), 2);
     }
 }
