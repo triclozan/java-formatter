@@ -31,32 +31,42 @@ public class Formatter {
     private int column;
     private FormatterStates state;
     private List<FormatterWarningInfo> warnings;
-    
-    final String PTN_COMMENT = "(//.*)$";
-    final String PTN_LARGE_COMMENT = "/*[^*]**/$";
-    final String PTN_ID = "[]";
-    
-    final String WRN_LEFT_BRACE = "Left brace mismatch";
-    final String WRN_RIGHT_BRACE = "Right brace mismatch";
-    
+          
     final int BUFFER_SIZE = 4096;
     final String newLine = "\n";
     
+    /**
+     * Applies given settings to the formatter
+     * @param settings Settings to apply
+     */
     public final void setSettings(FormatterSettings settings) {
         this.settings = settings;
         applySettings();
     }
     
+    /**
+     * Default constructor, uses default settings
+     */
     public Formatter() {
         setSettings(new FormatterSettings());
         warnings = new LinkedList<FormatterWarningInfo>();
     }
         
+    /**
+     * Constructor with settings to apply
+     * @param settings 
+     */
     public Formatter(FormatterSettings settings) {
         setSettings(settings);
         warnings = new LinkedList<FormatterWarningInfo>();
     }
       
+    /**
+     * Takes data from the input stream and writes the formatted data to the output stream 
+     * @param input Input stream to be formatted
+     * @param output Output stream receiving formatting result
+     * @throws IOException 
+     */
     public void format(InputStream input, OutputStream output) throws IOException {
         log.debug("started formatting");
         
@@ -157,19 +167,34 @@ public class Formatter {
         log.debug("finished formatting");
     }  
   
+    /**
+     * 
+     * @return List of warnings generated during latest formatting operation
+     */
     public List<FormatterWarningInfo> getWarnings() {
         return warnings;
     }    
     
+    /**
+     * Adds new warning to the warning list
+     * @param warning The new warning 
+     * @param count Actual number of warnings it describes
+     */
     private void addWarning(FormatterWarnings warning, int count) {
         warnings.add(new FormatterWarningInfo(warning, count, -1, -1));
     }    
     
+    /**
+     * Increases current nesting level
+     */
     private void increaseIndent() {
         indent++;
         log.trace("indent increased to " + Integer.toString(indent));
     }
-
+    
+    /**
+     * Decreases current nesting level
+     */
     private void decreaseIndent() {
         indent--;
         if (indent < 0) {
@@ -179,17 +204,29 @@ public class Formatter {
         log.trace("indent decreased to " + Integer.toString(indent));
     }    
 
+    /**
+     * Puts finite automaton in a new state
+     * @param state New state of the finite automaton
+     */
     private void moveToState(FormatterStates state) {
         this.state = state;
         log.trace("state changed to " + state.getName());
     }    
     
+    /**
+     * Processes current settings to initialize some class fields
+     */
     private void applySettings() {
         indentSymbol = settings.getValue(FormatterProperties.INDENT_SYMBOL);
         indentSize = Integer.valueOf(settings.getValue(FormatterProperties.INDENT_SIZE));
         log.setLevel(Level.toLevel(settings.getValue(FormatterProperties.LOGGING_LEVEL)));
     }
     
+    /**
+     * Auxilary method creating indentation string based on block nesting level
+     * @param n The block nesting level (number of primitive indents)
+     * @return The indentation string
+     */
     private String formIndent(int n) {
         return new String(new char[n * indentSize]).replace("\0", indentSymbol);
     }
