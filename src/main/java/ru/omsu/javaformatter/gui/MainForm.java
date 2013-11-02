@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import org.apache.log4j.Logger;
 import ru.omsu.javaformatter.Formatter;
 import ru.omsu.javaformatter.FormatterSettings;
@@ -256,25 +257,38 @@ public class MainForm extends javax.swing.JFrame {
         
         log.info("******Formatting a file*****");
         try {
-            in = new FileInputStream(inputFileTextField.getText());
-            out = new FileOutputStream(outputFileTextField.getText());
+            try {
+                in = new FileInputStream(inputFileTextField.getText());
+            }
+            catch (FileNotFoundException ex) {
+                String message = "File " + inputFileTextField.getText() + " not found";
+                JOptionPane.showMessageDialog(this, message, "Error", ERROR_MESSAGE);
+                log.error(message);
+                return;
+            }
+            try {
+                out = new FileOutputStream(outputFileTextField.getText());
+            }
+            catch (FileNotFoundException ex) {
+                String message = "File " + outputFileTextField.getText() + " not found";
+                JOptionPane.showMessageDialog(this, message, "Error", ERROR_MESSAGE);
+                log.error(message);
+                return;
+            }
+            
             formatter.format(in, out);
             out.close();
             for (String warning : formatter.getWarnings()) {
                 log.warn("Formatting warning: " + warning);
             }            
         }
-        catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, "File not found", "Warning", WARNING_MESSAGE);
-            log.error(null, ex);
-        }
         catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Problems with file saving", "Warning", WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Input/output error, check file permissions and availability", "Error", ERROR_MESSAGE);
             log.error(null, ex);
         }
         catch (Exception ex) {
             String message = "Unexpected exception! Keep calm and eat a sweet!";
-            JOptionPane.showMessageDialog(this, message, "Warning", WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Error", ERROR_MESSAGE);
             log.fatal(null, ex);
         }
     }//GEN-LAST:event_fileProcessButtonActionPerformed
@@ -294,12 +308,8 @@ public class MainForm extends javax.swing.JFrame {
                 log.warn("Formatting warning: " + warning);
             }  
         }
-        catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, "File not found", "Warning", WARNING_MESSAGE);
-            log.error(null, ex);
-        }
         catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Problems with file saving", "Warning", WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Input/output error while processing a string... Weird!", "Warning", WARNING_MESSAGE);
             log.error(null, ex);
         }
         catch (Exception ex) {
