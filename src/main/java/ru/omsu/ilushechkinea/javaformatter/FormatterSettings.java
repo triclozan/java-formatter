@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Loads, saves and stores set of formatter settings as a map
  * @author ilushechkinea
  */
  public class FormatterSettings {

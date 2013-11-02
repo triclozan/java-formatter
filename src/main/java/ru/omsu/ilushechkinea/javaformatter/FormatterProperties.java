@@ -7,7 +7,7 @@ package ru.omsu.ilushechkinea.javaformatter;
 import java.util.Properties;
 
 /**
- *
+ * Enumeration of recognizable formatter properties
  * @author ilushechkinea
  */
  public enum FormatterProperties {

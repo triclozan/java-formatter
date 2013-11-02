@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Formatter implementation
  * @author ilushechkinea
  */
 public class Formatter {

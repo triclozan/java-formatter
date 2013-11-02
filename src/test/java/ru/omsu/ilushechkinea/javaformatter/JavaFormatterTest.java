@@ -11,7 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Unit test for simple App.
+ * Tests for JavaFormatter class
+ * @author ilushechkinea
  */
 public class JavaFormatterTest {
     private ByteArrayOutputStream mockBaos;

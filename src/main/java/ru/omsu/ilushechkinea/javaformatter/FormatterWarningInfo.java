@@ -6,7 +6,7 @@
 package ru.omsu.ilushechkinea.javaformatter;
 
 /**
- *
+ * Contains information about one warning
  * @author ilushechkinea
  */
 public class FormatterWarningInfo {

@@ -22,7 +22,7 @@ import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
 import ru.omsu.ilushechkinea.util.StringInputStream;
 
 /**
- *
+ * Main application form of JavaFormatter project
  * @author ilushechkinea
  */
 public class MainForm extends javax.swing.JFrame {

@@ -5,7 +5,7 @@
 package ru.omsu.ilushechkinea.javaformatter;
 
 /**
- *
+ * Enumeration of finite automata (kernel of the formatter) states
  * @author ilushechkinea
  */
 public enum FormatterStates {

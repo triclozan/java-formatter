@@ -6,7 +6,7 @@
 package ru.omsu.ilushechkinea.javaformatter;
 
 /**
- *
+ * Enumeration of possible formatter warnings
  * @author ilushechkinea
  */
 public enum FormatterWarnings {

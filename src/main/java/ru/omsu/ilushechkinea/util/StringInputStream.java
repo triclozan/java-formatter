@@ -5,8 +5,9 @@
 package ru.omsu.ilushechkinea.util;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+
 /**
- *
+ * Simple InputStream child that reads from a string
  * @author ilushechkinea
  */
 public class StringInputStream extends ByteArrayInputStream {
