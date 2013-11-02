@@ -1,19 +1,14 @@
 package ru.omsu.ilushechkinea.javaformatter;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
-import ru.omsu.ilushechkinea.javaformatter.Formatter;
-import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
-import ru.omsu.ilushechkinea.javaformatter.FormatterWarnings;
 import ru.omsu.ilushechkinea.util.StringInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Unit test for simple App.
@@ -28,14 +23,14 @@ public class JavaFormatterTest {
     @Before
     public void setUp() {
         mockBaos = new ByteArrayOutputStream();
-        Formatter formatter = new Formatter();  
+        formatter = new Formatter();  
     }
     
     /*
      * Test for null input stream
      */    
     @Test(expected=NullPointerException.class)
-    public void testNullInput() throws UnsupportedEncodingException, IOException {        
+    public void testNullInput() throws IOException {        
         formatter.format(null, mockBaos);
     }
 
@@ -43,10 +38,19 @@ public class JavaFormatterTest {
      * Test for null output stream
      */   
     @Test(expected=NullPointerException.class)
-    public void testNullOutput() throws UnsupportedEncodingException, IOException {        
+    public void testNullOutput() throws IOException {        
         formatter.format(new StringInputStream("") , null);
-    }    
-
+    }   
+    
+    /*
+     * Test for nonexistent file
+     */    
+    @Test(expected=FileNotFoundException.class)
+    public void testNonexistentFile() throws IOException {        
+        FileOutputStream out = new FileOutputStream("b//l//a//b//l//a//b//l//a");
+        formatter.format(new StringInputStream(""), out);
+    }   
+    
     /*
      * Tests for correct input and output streams (but input content can be wrong itself)
      */     
