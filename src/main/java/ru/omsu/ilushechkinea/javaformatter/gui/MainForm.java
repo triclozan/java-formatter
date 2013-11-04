@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import ru.omsu.ilushechkinea.javaformatter.Formatter;
 import ru.omsu.ilushechkinea.javaformatter.FormatterSettings;
 import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
+import ru.omsu.ilushechkinea.javaformatter.IFormatter;
 import ru.omsu.ilushechkinea.util.StringInputStream;
 import ru.omsu.ilushechkinea.javaformatter.exceptions.*;
 
@@ -27,7 +28,7 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.*;
  */
 public class MainForm extends javax.swing.JFrame {
     static private Logger log = Logger.getLogger(MainForm.class);
-    private Formatter formatter;
+    private IFormatter formatter;
     /**
      * Creates new form MainForm
      */

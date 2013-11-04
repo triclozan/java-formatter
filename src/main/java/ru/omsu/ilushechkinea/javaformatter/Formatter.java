@@ -19,7 +19,7 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.InvalidStreamException;
  * Formatter implementation
  * @author ilushechkinea
  */
-public class Formatter {
+public class Formatter implements IFormatter {
     private Logger log = Logger.getLogger(Formatter.class);
     
     private InputStreamReader input;
@@ -47,6 +47,7 @@ public class Formatter {
      * Applies given settings to the formatter
      * @param settings Settings to apply
      */
+    @Override
     public final void setSettings(FormatterSettings settings) {
         this.settings = settings;
         applySettings();
@@ -73,8 +74,9 @@ public class Formatter {
      * Takes data from the input stream and writes the formatted data to the output stream 
      * @param input Input stream to be formatted
      * @param output Output stream receiving formatting result
-     * @throws IOException 
+     * @throws InvalidStreamException, FormattingException 
      */
+    @Override
     public void format(InputStream input, OutputStream output) 
            throws InvalidStreamException, FormattingException {
         log.debug("started formatting");
@@ -330,6 +332,7 @@ public class Formatter {
      * 
      * @return List of warnings generated during latest formatting operation
      */
+    @Override
     public List<FormatterWarningInfo> getWarnings() {
         return warnings;
     }    
