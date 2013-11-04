@@ -29,11 +29,14 @@ public class Formatter {
     private int rightBraceMismatches;
     private int row;
     private int column;
+    private String operation;
     private FormatterStates state;
+    private FormatterStates prevState;
     private List<FormatterWarningInfo> warnings;
           
     final int BUFFER_SIZE = 4096;
     final String newLine = "\n";
+    final String OPERATIONS = "+-*/!&|><=%~^";
     
     /**
      * Applies given settings to the formatter
@@ -80,6 +83,7 @@ public class Formatter {
         row = 0;
         column = 0;
         state = FormatterStates.STRING_START;
+        prevState = FormatterStates.STRING_START;
         char[] buffer = new char[BUFFER_SIZE];
         int bytesRead = 0;
         
@@ -98,24 +102,19 @@ public class Formatter {
                         else if (!Character.isWhitespace(c)) {
                             if (c == '}') {
                                 decreaseIndent();
-                            }
-                            
-                            outputWriter.write(formIndent(indent));
-                            outputWriter.write(c);                            
-                            
-                            if (c == '{') {
-                                increaseIndent();
-                            }
-                            
-                            if (c == '{' || c == '}') {
-                                moveToState(FormatterStates.AFTER_BRACE);  
+                                outputWriter.write(formIndent(indent));
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.END_STRING);
                             }
                             else {
-                                moveToState(FormatterStates.NORMAL);    
-                            }
+                                outputWriter.write(formIndent(indent));
+                                moveToState(FormatterStates.NORMAL);
+                                ptr--;
+                                column--;                             
+                            }                           
                         }
                         break;
-                    case AFTER_BRACE:
+                    case END_STRING:
                         if (c == '\n') {
                             outputWriter.write(newLine);
                             moveToState(FormatterStates.STRING_START);
@@ -128,6 +127,95 @@ public class Formatter {
                             column--;
                         }
                         break;
+                    case STRING_LITERAL:
+                        if (c == '\\') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.ESC_STRING_LITERAL);
+                        }
+                        else if (c == '"') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.NORMAL);
+                        }
+                        else {
+                            outputWriter.write(c);
+                        }
+                        break;
+                    case SYMBOLIC_LITERAL:
+                        if (c == '\\') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.ESC_SYMBOLIC_LITERAL);
+                        }
+                        else if (c == '\'') {
+                            moveToState(FormatterStates.NORMAL);
+                        }
+                        else {
+                            outputWriter.write(c);
+                        }
+                        break;
+                    case ESC_STRING_LITERAL:
+                        outputWriter.write(c);
+                        moveToState(FormatterStates.STRING_LITERAL);
+                        break;
+                    case ESC_SYMBOLIC_LITERAL:
+                        outputWriter.write(c);
+                        moveToState(FormatterStates.SYMBOLIC_LITERAL);
+                        break;
+                    case COMMENT:
+                        if (c == '\n') {
+                            outputWriter.write(newLine);
+                            moveToState(FormatterStates.STRING_START);
+                        }
+                        else {
+                            outputWriter.write(c);
+                        }
+                        break;
+                    case EXT_COMMENT:
+                        if (c == '*') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.EXT_COMMENT_STAR);
+                        }
+                        else {
+                            outputWriter.write(c);
+                        }
+                        break;
+                    case EXT_COMMENT_STAR:
+                        if (c == '/') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.NORMAL);
+                        }
+                        else {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.EXT_COMMENT);
+                        }
+                        break;
+                    case OPERATION:
+                        if (operation.equals("/") && c == '/') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.COMMENT);
+                        }
+                        else if (operation.equals("/") && c == '*') {
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.EXT_COMMENT);
+                        }
+                        else if (OPERATIONS.indexOf(c) >= 0) {
+                            outputWriter.write(c);
+                        }
+                        else {
+                            ptr--;
+                            column--;
+                            moveToState(FormatterStates.WS_SEQ);
+                        }
+                        break;
+                    case WS_SEQ:
+                        if (!Character.isWhitespace(c)) {
+                            ptr--;
+                            column--;
+                            outputWriter.write(' ');
+                            moveToState(FormatterStates.NORMAL);
+                        }
+                        else {
+                        }
+                        break;
                     case NORMAL:
                         if (c == '\n') {
                             outputWriter.write(newLine);
@@ -136,17 +224,42 @@ public class Formatter {
                         }
                         else {
                             if (c == '}') {
-                                outputWriter.write(newLine);
-                                moveToState(FormatterStates.STRING_START);
                                 ptr--;
                                 column--;
+                                outputWriter.write(newLine);
+                                moveToState(FormatterStates.STRING_START);
                             }
                             else if (c == '{') {
                                 outputWriter.write(c);
                                 increaseIndent();
-                                moveToState(FormatterStates.AFTER_BRACE);
+                                moveToState(FormatterStates.END_STRING);
+                            }
+                            else if (c == '\'') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.SYMBOLIC_LITERAL);
+                            }
+                            else if (c == '\"') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.STRING_LITERAL);
+                            }
+                            else if (c == ';') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.END_STRING);
+                            }
+                            else if (OPERATIONS.indexOf(c) >= 0) {
+                                if (prevState != FormatterStates.WS_SEQ) {
+                                    outputWriter.write(' ');
+                                }
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.OPERATION);
+                                operation = "" + c;
+                            }
+                            else if (Character.isWhitespace(c)) {
+                                moveToState(FormatterStates.WS_SEQ);
+                                operation = "" + c;
                             }
                             else {
+                                prevState = FormatterStates.NORMAL;
                                 outputWriter.write(c);
                             }
                         }                        
@@ -209,6 +322,7 @@ public class Formatter {
      * @param state New state of the finite automaton
      */
     private void moveToState(FormatterStates state) {
+        prevState = this.state;
         this.state = state;
         log.trace("state changed to " + state.getName());
     }    

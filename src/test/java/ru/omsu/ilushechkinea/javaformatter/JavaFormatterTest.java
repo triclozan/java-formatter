@@ -62,7 +62,8 @@ public class JavaFormatterTest {
         //Test for formatting of single string code
         String test1 = "qwe {int i=0; for (asdad) {sdf}}";
         String res1 = "qwe {\n" +
-            "    int i=0; for (asdad) {\n" +
+            "    int i = 0;\n" + 
+            "    for (asdad) {\n" +
             "        sdf\n" +
             "    }\n" +
             "}";
@@ -73,7 +74,7 @@ public class JavaFormatterTest {
 
         //Test for preserving newlines during formatting
         String test2 = "qwe "
-                + "{int i=0; for (asdad) "
+                + "{int i = 0; for (asdad) "
                 + "{sdf}"
                 + "}"; 
         mockBaos.reset();
@@ -86,6 +87,19 @@ public class JavaFormatterTest {
         mockBaos.reset();
         f.format(new StringInputStream(test3), mockBaos);
         assertEquals(mockBaos.toString(), res2);
+        
+        //Test for string literals and operation signs handling
+        String test4 = "{i =\"{}\";for(a =1){b =2+5;c =7}}";
+        String res3 = "{\n" +
+                    "    i = \"{}\";\n" +
+                    "    for(a = 1){\n" +
+                    "        b = 2 + 5;\n" +
+                    "        c = 7\n" +
+                    "    }\n" +
+                    "}";
+        mockBaos.reset();
+        f.format(new StringInputStream(test4), mockBaos);
+        assertEquals(mockBaos.toString(), res3);
         
         //Test for brace mismatch detection
         String test10 = "{}}{{"; 
