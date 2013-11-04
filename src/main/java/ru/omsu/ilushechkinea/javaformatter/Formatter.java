@@ -146,6 +146,7 @@ public class Formatter {
                             moveToState(FormatterStates.ESC_SYMBOLIC_LITERAL);
                         }
                         else if (c == '\'') {
+                            outputWriter.write(c);
                             moveToState(FormatterStates.NORMAL);
                         }
                         else {
