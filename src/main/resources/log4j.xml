@@ -26,7 +26,7 @@
         <appender-ref ref="console"/>
         <appender-ref ref="file"/>
     </root>-->
-    <logger name="ru.omsu.javaformatter.Formatter">
+    <logger name="ru.omsu.ilushechkinea.javaformatter.Formatter">
         <appender-ref ref="file2"/>
     </logger>
     <logger name="ru.omsu.ilushechkinea.javaformatter.gui.MainForm">
