@@ -11,14 +11,16 @@ Besides a class for code formatting the project contains gui form that can be us
 <b>formatter.logging.level</b> - level of logging (can be TRACE, DEBUG, INFO, WARN, ERROR, FATAL).
 
 ## Current abilities
-1. Inserts new line symbol after opening and closing braces (if there is no one)
+1. Inserts new line symbol after opening braces, closing braces, semicolons (if needed)
 2. Makes indentation based on block's nesting level
-3. Finds brace mismatch and logs it
+3. Finds brace mismatches and logs them
 4. Detailed trace of string processing (including underlying finite automaton transitions) if needed
+5. Inserts whitespaces before and after operation signs
+6. Handles one-line and multiline comments
 
 ## Known limitations
-1. Can't deal with braces inside string or symbol literals
-2. Don't preserve comments on the same line as brace
+1. Don't preserve comments on the same line as brace
+2. Separates increment and decrement operators from their operands with whitespaces 
 
 ## License
 Copyright (c) 2013 Eugene Ilushechkin
