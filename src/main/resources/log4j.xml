@@ -29,7 +29,7 @@
     <logger name="ru.omsu.javaformatter.Formatter">
         <appender-ref ref="file2"/>
     </logger>
-    <logger name="ru.omsu.javaformatter.gui.MainForm">
+    <logger name="ru.omsu.ilushechkinea.javaformatter.gui.MainForm">
         <appender-ref ref="console"/>
         <appender-ref ref="file"/>
     </logger>

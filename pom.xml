@@ -38,7 +38,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.omsu.javaformatter.gui.MainForm</mainClass>
+                            <mainClass>ru.omsu.ilushechkinea.javaformatter.gui.MainForm</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
