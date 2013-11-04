@@ -37,7 +37,7 @@ public class Formatter {
     private String operation;
     private FormatterStates state;
     private FormatterStates prevState;
-
+    private char prevChar;
           
     final int BUFFER_SIZE = 4096;
     final String newLine = "\n";
@@ -99,6 +99,8 @@ public class Formatter {
         column = 0;
         state = FormatterStates.STRING_START;
         prevState = FormatterStates.STRING_START;
+        prevChar = '\0';
+        boolean goNext;
         char[] buffer = new char[BUFFER_SIZE];
         int bytesRead = 0;
         
@@ -108,6 +110,7 @@ public class Formatter {
                 int ptr = 0;
                 while (ptr < bytesRead) {
                     char c = buffer[ptr];
+                    goNext = true;
                     log.trace("processing char " + c + " in state " + state.getName());
                     switch(state) {
                         case STRING_START:
@@ -126,8 +129,7 @@ public class Formatter {
                                 else {
                                     outputWriter.write(formIndent(indent));
                                     moveToState(FormatterStates.NORMAL);
-                                    ptr--;
-                                    column--;                             
+                                    goNext = false;                         
                                 }                           
                             }
                             break;
@@ -140,8 +142,7 @@ public class Formatter {
                             else if (!Character.isWhitespace(c)) {
                                 outputWriter.write(newLine);
                                 moveToState(FormatterStates.STRING_START);
-                                ptr--;
-                                column--;
+                                goNext = false;   
                             }
                             break;
                         case STRING_LITERAL:
@@ -219,19 +220,21 @@ public class Formatter {
                                 outputWriter.write(c);
                             }
                             else {
-                                ptr--;
-                                column--;
+                                goNext = false;   
                                 moveToState(FormatterStates.WS_SEQ);
                             }
                             break;
                         case WS_SEQ:
                             if (!Character.isWhitespace(c)) {
-                                ptr--;
-                                column--;
+                                goNext = false;   
                                 outputWriter.write(' ');
                                 moveToState(FormatterStates.NORMAL);
                             }
                             else {
+                                if (c == '\n') {
+                                    moveToState(FormatterStates.STRING_START);
+                                    outputWriter.write(newLine);
+                                }
                             }
                             break;
                         case NORMAL:
@@ -242,8 +245,7 @@ public class Formatter {
                             }
                             else {
                                 if (c == '}') {
-                                    ptr--;
-                                    column--;
+                                    goNext = false;   
                                     outputWriter.write(newLine);
                                     moveToState(FormatterStates.STRING_START);
                                 }
@@ -270,12 +272,17 @@ public class Formatter {
                                     }
                                 }
                                 else if (OPERATIONS.indexOf(c) >= 0) {
-                                    if (prevState != FormatterStates.WS_SEQ) {
-                                        outputWriter.write(' ');
+                                    if (c == '*' && prevChar == '.') {
+                                        outputWriter.write(c);
                                     }
-                                    outputWriter.write(c);
-                                    moveToState(FormatterStates.OPERATION);
-                                    operation = "" + c;
+                                    else {
+                                        if (prevState != FormatterStates.WS_SEQ && prevState != FormatterStates.STRING_START) {
+                                            outputWriter.write(' ');
+                                        }
+                                        outputWriter.write(c);
+                                        moveToState(FormatterStates.OPERATION);
+                                        operation = "" + c;
+                                    }
                                 }
                                 else if (Character.isWhitespace(c)) {
                                     moveToState(FormatterStates.WS_SEQ);
@@ -294,8 +301,11 @@ public class Formatter {
                             }                        
                             break;
                     }
-                    ptr++;
-                    column++;
+                    if (goNext) {
+                        ptr++;
+                        column++;
+                        prevChar = c;
+                    }
                 }
             } 
             outputWriter.flush();
