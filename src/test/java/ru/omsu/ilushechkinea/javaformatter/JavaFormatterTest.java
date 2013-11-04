@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import ru.omsu.ilushechkinea.javaformatter.exceptions.*;
 
 /**
  * Tests for JavaFormatter class
@@ -30,16 +31,19 @@ public class JavaFormatterTest {
     /*
      * Test for null input stream
      */    
-    @Test(expected=NullPointerException.class)
-    public void testNullInput() throws IOException {        
+    @Test(expected=InvalidStreamException.class)
+    public void testNullInput() throws InvalidStreamException, 
+                                       FormattingException {        
         formatter.format(null, mockBaos);
     }
 
     /*
      * Test for null output stream
      */   
-    @Test(expected=NullPointerException.class)
-    public void testNullOutput() throws IOException {        
+    @Test(expected=InvalidStreamException.class)
+    public void testNullOutput() throws InvalidStreamException, 
+                                        FormattingException,
+                                        UnsupportedEncodingException {        
         formatter.format(new StringInputStream("") , null);
     }   
     
@@ -47,7 +51,10 @@ public class JavaFormatterTest {
      * Test for nonexistent file
      */    
     @Test(expected=FileNotFoundException.class)
-    public void testNonexistentFile() throws IOException {        
+    public void testNonexistentFile() throws InvalidStreamException, 
+                                             FormattingException, 
+                                             FileNotFoundException,
+                                             UnsupportedEncodingException {        
         FileOutputStream out = new FileOutputStream("b//l//a//b//l//a//b//l//a");
         formatter.format(new StringInputStream(""), out);
     }   
@@ -57,8 +64,9 @@ public class JavaFormatterTest {
      */     
     @Test
     public void testCorrectCases() 
-            throws UnsupportedEncodingException, IOException 
-    {
+             throws InvalidStreamException, 
+             FormattingException,
+             UnsupportedEncodingException {
         //Test for formatting of single string code
         String test1 = "qwe {int i=0; for (asdad) {sdf}}";
         String res1 = "qwe {\n" +
@@ -67,9 +75,7 @@ public class JavaFormatterTest {
             "        sdf\n" +
             "    }\n" +
             "}";
-        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Formatter f = new Formatter();
-        f.format(new StringInputStream(test1), mockBaos);
+        formatter.format(new StringInputStream(test1), mockBaos);
         assertEquals(mockBaos.toString(), res1);
 
         //Test for preserving newlines during formatting
@@ -78,14 +84,14 @@ public class JavaFormatterTest {
                 + "{sdf}"
                 + "}"; 
         mockBaos.reset();
-        f.format(new StringInputStream(test2), mockBaos);
+        formatter.format(new StringInputStream(test2), mockBaos);
         assertEquals(mockBaos.toString(), res1);
         
         //Test for empty string handling
         String test3 = ""; 
         String res2 = "";
         mockBaos.reset();
-        f.format(new StringInputStream(test3), mockBaos);
+        formatter.format(new StringInputStream(test3), mockBaos);
         assertEquals(mockBaos.toString(), res2);
         
         //Test for string literals and operation signs handling
@@ -98,17 +104,17 @@ public class JavaFormatterTest {
                     "    }\n" +
                     "}";
         mockBaos.reset();
-        f.format(new StringInputStream(test4), mockBaos);
+        formatter.format(new StringInputStream(test4), mockBaos);
         assertEquals(mockBaos.toString(), res3);
         
         //Test for brace mismatch detection
         String test10 = "{}}{{"; 
         mockBaos.reset();
-        f.format(new StringInputStream(test10), mockBaos);
+        formatter.format(new StringInputStream(test10), mockBaos);
         FormatterWarningInfo wi = new FormatterWarningInfo(FormatterWarnings.WRN_LEFT_BRACE, 2, -1, -1);
         FormatterWarningInfo wi2 = new FormatterWarningInfo(FormatterWarnings.WRN_RIGHT_BRACE, 1, -1, -1);
-        assertEquals(f.getWarnings().contains(wi), true);
-        assertEquals(f.getWarnings().contains(wi2), true);
-        assertEquals(f.getWarnings().size(), 2);
+        assertEquals(formatter.getWarnings().contains(wi), true);
+        assertEquals(formatter.getWarnings().contains(wi2), true);
+        assertEquals(formatter.getWarnings().size(), 2);
     }
 }

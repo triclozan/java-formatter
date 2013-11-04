@@ -12,6 +12,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import java.util.LinkedList;
 import java.util.List;
+import ru.omsu.ilushechkinea.javaformatter.exceptions.FormattingException;
+import ru.omsu.ilushechkinea.javaformatter.exceptions.InvalidStreamException;
 
 /**
  * Formatter implementation
@@ -73,8 +75,17 @@ public class Formatter {
      * @param output Output stream receiving formatting result
      * @throws IOException 
      */
-    public void format(InputStream input, OutputStream output) throws IOException {
+    public void format(InputStream input, OutputStream output) 
+           throws InvalidStreamException, FormattingException {
         log.debug("started formatting");
+        
+        if (input == null) {
+            throw new InvalidStreamException("Null input stream");
+        }
+
+        if (output == null) {
+            throw new InvalidStreamException("Null output stream");
+        }
         
         InputStreamReader inputReader = new InputStreamReader(input);        
         OutputStreamWriter outputWriter = new OutputStreamWriter(output);
@@ -91,201 +102,210 @@ public class Formatter {
         char[] buffer = new char[BUFFER_SIZE];
         int bytesRead = 0;
         
-        while ((bytesRead = inputReader.read(buffer)) != -1) {
-            int ptr = 0;
-            while (ptr < bytesRead) {
-                char c = buffer[ptr];
-                log.trace("processing char " + c + " in state " + state.getName());
-                switch(state) {
-                    case STRING_START:
-                        if (c == '\n') {
-                            outputWriter.write(formIndent(indent));
-                            outputWriter.write(newLine);
-                            row++;
-                        }
-                        else if (!Character.isWhitespace(c)) {
-                            if (c == '}') {
-                                decreaseIndent();
+        try {
+
+            while ((bytesRead = inputReader.read(buffer)) != -1) {
+                int ptr = 0;
+                while (ptr < bytesRead) {
+                    char c = buffer[ptr];
+                    log.trace("processing char " + c + " in state " + state.getName());
+                    switch(state) {
+                        case STRING_START:
+                            if (c == '\n') {
                                 outputWriter.write(formIndent(indent));
-                                outputWriter.write(c);
-                                moveToState(FormatterStates.END_STRING);
+                                outputWriter.write(newLine);
+                                row++;
                             }
-                            else {
-                                outputWriter.write(formIndent(indent));
-                                moveToState(FormatterStates.NORMAL);
-                                ptr--;
-                                column--;                             
-                            }                           
-                        }
-                        break;
-                    case END_STRING:
-                        if (c == '\n') {
-                            outputWriter.write(newLine);
-                            moveToState(FormatterStates.STRING_START);
-                            row++;
-                        }
-                        else if (!Character.isWhitespace(c)) {
-                            outputWriter.write(newLine);
-                            moveToState(FormatterStates.STRING_START);
-                            ptr--;
-                            column--;
-                        }
-                        break;
-                    case STRING_LITERAL:
-                        if (c == '\\') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.ESC_STRING_LITERAL);
-                        }
-                        else if (c == '"') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.NORMAL);
-                        }
-                        else {
-                            outputWriter.write(c);
-                        }
-                        break;
-                    case SYMBOLIC_LITERAL:
-                        if (c == '\\') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.ESC_SYMBOLIC_LITERAL);
-                        }
-                        else if (c == '\'') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.NORMAL);
-                        }
-                        else {
-                            outputWriter.write(c);
-                        }
-                        break;
-                    case ESC_STRING_LITERAL:
-                        outputWriter.write(c);
-                        moveToState(FormatterStates.STRING_LITERAL);
-                        break;
-                    case ESC_SYMBOLIC_LITERAL:
-                        outputWriter.write(c);
-                        moveToState(FormatterStates.SYMBOLIC_LITERAL);
-                        break;
-                    case COMMENT:
-                        if (c == '\n') {
-                            outputWriter.write(newLine);
-                            moveToState(FormatterStates.STRING_START);
-                        }
-                        else {
-                            outputWriter.write(c);
-                        }
-                        break;
-                    case EXT_COMMENT:
-                        if (c == '*') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.EXT_COMMENT_STAR);
-                        }
-                        else {
-                            outputWriter.write(c);
-                        }
-                        break;
-                    case EXT_COMMENT_STAR:
-                        if (c == '/') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.NORMAL);
-                        }
-                        else {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.EXT_COMMENT);
-                        }
-                        break;
-                    case OPERATION:
-                        if (operation.equals("/") && c == '/') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.COMMENT);
-                        }
-                        else if (operation.equals("/") && c == '*') {
-                            outputWriter.write(c);
-                            moveToState(FormatterStates.EXT_COMMENT);
-                        }
-                        else if (OPERATIONS.indexOf(c) >= 0) {
-                            outputWriter.write(c);
-                        }
-                        else {
-                            ptr--;
-                            column--;
-                            moveToState(FormatterStates.WS_SEQ);
-                        }
-                        break;
-                    case WS_SEQ:
-                        if (!Character.isWhitespace(c)) {
-                            ptr--;
-                            column--;
-                            outputWriter.write(' ');
-                            moveToState(FormatterStates.NORMAL);
-                        }
-                        else {
-                        }
-                        break;
-                    case NORMAL:
-                        if (c == '\n') {
-                            outputWriter.write(newLine);
-                            moveToState(FormatterStates.STRING_START);
-                            row++;
-                        }
-                        else {
-                            if (c == '}') {
-                                ptr--;
-                                column--;
+                            else if (!Character.isWhitespace(c)) {
+                                if (c == '}') {
+                                    decreaseIndent();
+                                    outputWriter.write(formIndent(indent));
+                                    outputWriter.write(c);
+                                    moveToState(FormatterStates.END_STRING);
+                                }
+                                else {
+                                    outputWriter.write(formIndent(indent));
+                                    moveToState(FormatterStates.NORMAL);
+                                    ptr--;
+                                    column--;                             
+                                }                           
+                            }
+                            break;
+                        case END_STRING:
+                            if (c == '\n') {
                                 outputWriter.write(newLine);
                                 moveToState(FormatterStates.STRING_START);
+                                row++;
                             }
-                            else if (c == '{') {
+                            else if (!Character.isWhitespace(c)) {
+                                outputWriter.write(newLine);
+                                moveToState(FormatterStates.STRING_START);
+                                ptr--;
+                                column--;
+                            }
+                            break;
+                        case STRING_LITERAL:
+                            if (c == '\\') {
                                 outputWriter.write(c);
-                                increaseIndent();
-                                moveToState(FormatterStates.END_STRING);
+                                moveToState(FormatterStates.ESC_STRING_LITERAL);
+                            }
+                            else if (c == '"') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.NORMAL);
+                            }
+                            else {
+                                outputWriter.write(c);
+                            }
+                            break;
+                        case SYMBOLIC_LITERAL:
+                            if (c == '\\') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.ESC_SYMBOLIC_LITERAL);
                             }
                             else if (c == '\'') {
                                 outputWriter.write(c);
-                                moveToState(FormatterStates.SYMBOLIC_LITERAL);
-                            }
-                            else if (c == '\"') {
-                                outputWriter.write(c);
-                                moveToState(FormatterStates.STRING_LITERAL);
-                            }
-                            else if (c == ';') {
-                                outputWriter.write(c);
-                                if (parenthesisLevel > 0) {
-                                    moveToState(FormatterStates.WS_SEQ);
-                                }
-                                else {
-                                    moveToState(FormatterStates.END_STRING);
-                                }
-                            }
-                            else if (OPERATIONS.indexOf(c) >= 0) {
-                                if (prevState != FormatterStates.WS_SEQ) {
-                                    outputWriter.write(' ');
-                                }
-                                outputWriter.write(c);
-                                moveToState(FormatterStates.OPERATION);
-                                operation = "" + c;
-                            }
-                            else if (Character.isWhitespace(c)) {
-                                moveToState(FormatterStates.WS_SEQ);
-                                operation = "" + c;
+                                moveToState(FormatterStates.NORMAL);
                             }
                             else {
-                                if (c == '(') {
-                                    parenthesisLevel++;
-                                }
-                                if (c == ')') {
-                                    parenthesisLevel--;
-                                }
-                                prevState = FormatterStates.NORMAL;
                                 outputWriter.write(c);
                             }
-                        }                        
-                        break;
+                            break;
+                        case ESC_STRING_LITERAL:
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.STRING_LITERAL);
+                            break;
+                        case ESC_SYMBOLIC_LITERAL:
+                            outputWriter.write(c);
+                            moveToState(FormatterStates.SYMBOLIC_LITERAL);
+                            break;
+                        case COMMENT:
+                            if (c == '\n') {
+                                outputWriter.write(newLine);
+                                moveToState(FormatterStates.STRING_START);
+                            }
+                            else {
+                                outputWriter.write(c);
+                            }
+                            break;
+                        case EXT_COMMENT:
+                            if (c == '*') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.EXT_COMMENT_STAR);
+                            }
+                            else {
+                                outputWriter.write(c);
+                            }
+                            break;
+                        case EXT_COMMENT_STAR:
+                            if (c == '/') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.NORMAL);
+                            }
+                            else {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.EXT_COMMENT);
+                            }
+                            break;
+                        case OPERATION:
+                            if (operation.equals("/") && c == '/') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.COMMENT);
+                            }
+                            else if (operation.equals("/") && c == '*') {
+                                outputWriter.write(c);
+                                moveToState(FormatterStates.EXT_COMMENT);
+                            }
+                            else if (OPERATIONS.indexOf(c) >= 0) {
+                                outputWriter.write(c);
+                            }
+                            else {
+                                ptr--;
+                                column--;
+                                moveToState(FormatterStates.WS_SEQ);
+                            }
+                            break;
+                        case WS_SEQ:
+                            if (!Character.isWhitespace(c)) {
+                                ptr--;
+                                column--;
+                                outputWriter.write(' ');
+                                moveToState(FormatterStates.NORMAL);
+                            }
+                            else {
+                            }
+                            break;
+                        case NORMAL:
+                            if (c == '\n') {
+                                outputWriter.write(newLine);
+                                moveToState(FormatterStates.STRING_START);
+                                row++;
+                            }
+                            else {
+                                if (c == '}') {
+                                    ptr--;
+                                    column--;
+                                    outputWriter.write(newLine);
+                                    moveToState(FormatterStates.STRING_START);
+                                }
+                                else if (c == '{') {
+                                    outputWriter.write(c);
+                                    increaseIndent();
+                                    moveToState(FormatterStates.END_STRING);
+                                }
+                                else if (c == '\'') {
+                                    outputWriter.write(c);
+                                    moveToState(FormatterStates.SYMBOLIC_LITERAL);
+                                }
+                                else if (c == '\"') {
+                                    outputWriter.write(c);
+                                    moveToState(FormatterStates.STRING_LITERAL);
+                                }
+                                else if (c == ';') {
+                                    outputWriter.write(c);
+                                    if (parenthesisLevel > 0) {
+                                        moveToState(FormatterStates.WS_SEQ);
+                                    }
+                                    else {
+                                        moveToState(FormatterStates.END_STRING);
+                                    }
+                                }
+                                else if (OPERATIONS.indexOf(c) >= 0) {
+                                    if (prevState != FormatterStates.WS_SEQ) {
+                                        outputWriter.write(' ');
+                                    }
+                                    outputWriter.write(c);
+                                    moveToState(FormatterStates.OPERATION);
+                                    operation = "" + c;
+                                }
+                                else if (Character.isWhitespace(c)) {
+                                    moveToState(FormatterStates.WS_SEQ);
+                                    operation = "" + c;
+                                }
+                                else {
+                                    if (c == '(') {
+                                        parenthesisLevel++;
+                                    }
+                                    if (c == ')') {
+                                        parenthesisLevel--;
+                                    }
+                                    prevState = FormatterStates.NORMAL;
+                                    outputWriter.write(c);
+                                }
+                            }                        
+                            break;
+                    }
+                    ptr++;
+                    column++;
                 }
-                ptr++;
-                column++;
-            }
-        } 
-        outputWriter.flush();
+            } 
+            outputWriter.flush();
+        }        
+        catch(IOException e) {
+            throw new FormattingException("Error occured while reading from stream or writing to stream");
+        }
+        catch(Exception e) {
+             throw new FormattingException("Unexpected formatting error occured");   
+        }
         
         if (rightBraceMismatches > 0) {
             addWarning(FormatterWarnings.WRN_RIGHT_BRACE, rightBraceMismatches);

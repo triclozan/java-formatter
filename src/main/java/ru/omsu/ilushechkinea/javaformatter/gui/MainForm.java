@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -20,6 +19,7 @@ import ru.omsu.ilushechkinea.javaformatter.Formatter;
 import ru.omsu.ilushechkinea.javaformatter.FormatterSettings;
 import ru.omsu.ilushechkinea.javaformatter.FormatterWarningInfo;
 import ru.omsu.ilushechkinea.util.StringInputStream;
+import ru.omsu.ilushechkinea.javaformatter.exceptions.*;
 
 /**
  * Main application form of JavaFormatter project
@@ -283,12 +283,16 @@ public class MainForm extends javax.swing.JFrame {
                 log.warn("Formatting warning: " + warning);
             }            
         }
-        catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Input/output error, check file permissions and availability", "Error", ERROR_MESSAGE);
+        catch (InvalidStreamException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", ERROR_MESSAGE);
+            log.error(null, ex);
+        }
+        catch (FormattingException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", ERROR_MESSAGE);
             log.error(null, ex);
         }
         catch (Exception ex) {
-            String message = "Unexpected exception! Keep calm and eat a sweet!";
+            String message = "Totally unexpected exception! Keep calm and eat a sweet!";
             JOptionPane.showMessageDialog(this, message, "Error", ERROR_MESSAGE);
             log.fatal(null, ex);
         }
@@ -309,13 +313,17 @@ public class MainForm extends javax.swing.JFrame {
                 log.warn("Formatting warning: " + warning);
             }  
         }
-        catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Input/output error while processing a string... Weird!", "Warning", WARNING_MESSAGE);
+        catch (InvalidStreamException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", ERROR_MESSAGE);
+            log.error(null, ex);
+        }
+        catch (FormattingException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", ERROR_MESSAGE);
             log.error(null, ex);
         }
         catch (Exception ex) {
-            String message = "Unexpected exception! Keep calm and eat a sweet!";
-            JOptionPane.showMessageDialog(this, message, "Warning", WARNING_MESSAGE);
+            String message = "Totally unexpected exception! Keep calm and eat a sweet!";
+            JOptionPane.showMessageDialog(this, message, "Error", ERROR_MESSAGE);
             log.fatal(null, ex);
         }
     }//GEN-LAST:event_stringProcessButtonActionPerformed
