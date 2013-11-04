@@ -250,7 +250,7 @@ public class Formatter {
                             else if (c == ';') {
                                 outputWriter.write(c);
                                 if (parenthesisLevel > 0) {
-                                    
+                                    moveToState(FormatterStates.WS_SEQ);
                                 }
                                 else {
                                     moveToState(FormatterStates.END_STRING);
