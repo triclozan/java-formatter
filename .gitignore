@@ -2,4 +2,6 @@ target/
 nbactions.xml
 nb-configuration.xml
 .svn/
+.idea/
+java-formatter.iml
 log/
