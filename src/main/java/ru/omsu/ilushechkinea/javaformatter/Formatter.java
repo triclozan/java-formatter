@@ -25,14 +25,17 @@ public class Formatter {
     private FormatterSettings settings;
     private int indentSize;
     private String indentSymbol;
-    private int indent;
     private int rightBraceMismatches;
+    private List<FormatterWarningInfo> warnings;
+    
+    private int indent;
     private int row;
     private int column;
+    private int parenthesisLevel;
     private String operation;
     private FormatterStates state;
     private FormatterStates prevState;
-    private List<FormatterWarningInfo> warnings;
+
           
     final int BUFFER_SIZE = 4096;
     final String newLine = "\n";
@@ -80,6 +83,7 @@ public class Formatter {
         warnings.clear();
 
         indent = 0;
+        parenthesisLevel = 0;
         row = 0;
         column = 0;
         state = FormatterStates.STRING_START;
@@ -245,7 +249,12 @@ public class Formatter {
                             }
                             else if (c == ';') {
                                 outputWriter.write(c);
-                                moveToState(FormatterStates.END_STRING);
+                                if (parenthesisLevel > 0) {
+                                    
+                                }
+                                else {
+                                    moveToState(FormatterStates.END_STRING);
+                                }
                             }
                             else if (OPERATIONS.indexOf(c) >= 0) {
                                 if (prevState != FormatterStates.WS_SEQ) {
@@ -260,6 +269,12 @@ public class Formatter {
                                 operation = "" + c;
                             }
                             else {
+                                if (c == '(') {
+                                    parenthesisLevel++;
+                                }
+                                if (c == ')') {
+                                    parenthesisLevel--;
+                                }
                                 prevState = FormatterStates.NORMAL;
                                 outputWriter.write(c);
                             }
