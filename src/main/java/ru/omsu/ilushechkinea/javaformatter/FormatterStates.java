@@ -10,7 +10,7 @@ package ru.omsu.ilushechkinea.javaformatter;
  */
 public enum FormatterStates {
     STRING_START("[Start of a line]"), 
-    END_STRING("[String ending]"),
+    STRING_END("[String ending]"),
     WS_SEQ("[Sequence of whitespace symbols]"),
     COMMENT("[One-line comment]"),
     EXT_COMMENT("[Multiline comment]"),

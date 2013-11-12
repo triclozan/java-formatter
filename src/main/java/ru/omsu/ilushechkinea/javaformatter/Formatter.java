@@ -22,8 +22,6 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.InvalidStreamException;
 public class Formatter implements IFormatter {
     private Logger log = Logger.getLogger(Formatter.class);
     
-    private InputStreamReader input;
-    private OutputStreamWriter output;
     private FormatterSettings settings;
     private int indentSize;
     private String indentSymbol;
@@ -63,7 +61,7 @@ public class Formatter implements IFormatter {
         
     /**
      * Constructor with settings to apply
-     * @param settings 
+     * @param settings FormatterSettings object containing settings for the formatter
      */
     public Formatter(FormatterSettings settings) {
         setSettings(settings);
@@ -126,7 +124,7 @@ public class Formatter implements IFormatter {
                                     decreaseIndent();
                                     outputWriter.write(formIndent(indent));
                                     outputWriter.write(c);
-                                    moveToState(FormatterStates.END_STRING);
+                                    moveToState(FormatterStates.STRING_END);
                                 }
                                 else {
                                     outputWriter.write(formIndent(indent));
@@ -135,7 +133,7 @@ public class Formatter implements IFormatter {
                                 }                           
                             }
                             break;
-                        case END_STRING:
+                        case STRING_END:
                             if (c == '\n') {
                                 outputWriter.write(newLine);
                                 moveToState(FormatterStates.STRING_START);
@@ -254,7 +252,7 @@ public class Formatter implements IFormatter {
                                 else if (c == '{') {
                                     outputWriter.write(c);
                                     increaseIndent();
-                                    moveToState(FormatterStates.END_STRING);
+                                    moveToState(FormatterStates.STRING_END);
                                 }
                                 else if (c == '\'') {
                                     outputWriter.write(c);
@@ -270,7 +268,7 @@ public class Formatter implements IFormatter {
                                         moveToState(FormatterStates.WS_SEQ);
                                     }
                                     else {
-                                        moveToState(FormatterStates.END_STRING);
+                                        moveToState(FormatterStates.STRING_END);
                                     }
                                 }
                                 else if (OPERATIONS.indexOf(c) >= 0) {
