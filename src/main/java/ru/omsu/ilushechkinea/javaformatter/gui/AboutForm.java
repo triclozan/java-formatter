@@ -8,7 +8,8 @@ package ru.omsu.ilushechkinea.javaformatter.gui;
  * Stub about form
  * @author ilushechkinea
  */
-public class AboutForm extends javax.swing.JDialog {
+@SuppressWarnings("FieldCanBeLocal")
+class AboutForm extends javax.swing.JDialog {
 
     /**
      * Creates new form AboutForm

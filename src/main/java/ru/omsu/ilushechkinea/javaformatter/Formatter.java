@@ -37,9 +37,9 @@ public class Formatter implements IFormatter {
     private FormatterStates prevState;
     private char prevChar;
           
-    final int BUFFER_SIZE = 4096;
-    final String newLine = "\n";
-    final String OPERATIONS = "+-*/!&|><=%~^";
+    private final int BUFFER_SIZE = 4096;
+    private final String newLine = "\n";
+    private final String OPERATIONS = "+-*/!&|><=%~^";
     
     /**
      * Applies given settings to the formatter
@@ -102,7 +102,7 @@ public class Formatter implements IFormatter {
         prevChar = '\0';
         boolean goNext;
         char[] buffer = new char[BUFFER_SIZE];
-        int bytesRead = 0;
+        int bytesRead;
         
         try {
 
