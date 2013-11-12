@@ -21,26 +21,43 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.InvalidStreamException;
  */
 public class Formatter implements IFormatter {
     private Logger log = Logger.getLogger(Formatter.class);
-    
+
+    /** Settings of the formatter */
     private FormatterSettings settings;
+
+    /** Size of indent */
     private int indentSize;
+
+    /** Symbol used for indentation */
     private String indentSymbol;
+
+    /** Number of right brace mismatches found */
     private int rightBraceMismatches;
+
+    /** List of generated warnings */
     private List<FormatterWarningInfo> warnings;
     
+    /** Current nesting level */
     private int indent;
-    private int row;
-    private int column;
-    private int parenthesisLevel;
+
+    /** Additional buffer storing current operation sign string */
     private String operation;
+
+    /** Current formatter state */
     private FormatterStates state;
+
+    /** Previous formatter state */
     private FormatterStates prevState;
-    private char prevChar;
-          
-    private final int BUFFER_SIZE = 4096;
-    private final String newLine = "\n";
-    private final String OPERATIONS = "+-*/!&|><=%~^";
-    
+
+    /** Size of read buffer */
+    final int BUFFER_SIZE = 4096;
+
+    /** Line break string */
+    final String newLine = "\n";
+
+    /** String containing operation signs */
+    final String OPERATIONS = "+-*/!&|><=%~^";
+
     /**
      * Applies given settings to the formatter
      * @param settings Settings to apply
@@ -78,7 +95,8 @@ public class Formatter implements IFormatter {
     public void format(InputStream input, OutputStream output) 
            throws InvalidStreamException, FormattingException {
         log.debug("started formatting");
-        
+
+        // Checks source, destination, initializes readers
         if (input == null) {
             throw new InvalidStreamException("Null input stream");
         }
@@ -86,26 +104,28 @@ public class Formatter implements IFormatter {
         if (output == null) {
             throw new InvalidStreamException("Null output stream");
         }
-        
-        InputStreamReader inputReader = new InputStreamReader(input);        
+
+        InputStreamReader inputReader = new InputStreamReader(input);
         OutputStreamWriter outputWriter = new OutputStreamWriter(output);
         
-        rightBraceMismatches = 0;
+        // Reset of member fields
         warnings.clear();
-
+        rightBraceMismatches = 0;
         indent = 0;
-        parenthesisLevel = 0;
-        row = 0;
-        column = 0;
+        int parenthesisLevel = 0;
+        int row = 0;
+        int column = 0;
         state = FormatterStates.STRING_START;
         prevState = FormatterStates.STRING_START;
-        prevChar = '\0';
-        boolean goNext;
-        char[] buffer = new char[BUFFER_SIZE];
-        int bytesRead;
-        
-        try {
+        char prevChar = '\0';
 
+        // Additional required variables
+        boolean goNext;
+        int bytesRead;
+        char[] buffer = new char[BUFFER_SIZE];
+
+        try {
+            // Finite automaton run
             while ((bytesRead = inputReader.read(buffer)) != -1) {
                 int ptr = 0;
                 while (ptr < bytesRead) {
@@ -208,6 +228,7 @@ public class Formatter implements IFormatter {
                             }
                             break;
                         case OPERATION:
+
                             if (operation.equals("/") && c == '/') {
                                 outputWriter.write(c);
                                 moveToState(FormatterStates.COMMENT);
@@ -307,22 +328,27 @@ public class Formatter implements IFormatter {
                         prevChar = c;
                     }
                 }
-            } 
+            }
+            // Save changes to destination
             outputWriter.flush();
         }        
         catch(IOException e) {
-            throw new FormattingException("Error occured while reading from stream or writing to stream");
+            throw new FormattingException("Error occurred while reading from stream or writing to stream");
         }
         catch(Exception e) {
-             throw new FormattingException("Unexpected formatting error occured");   
+             throw new FormattingException("Unexpected formatting error occurred");
         }
         
+        // Add warning for right brace mismatches
         if (rightBraceMismatches > 0) {
             addWarning(FormatterWarnings.WRN_RIGHT_BRACE, rightBraceMismatches);
         }
+
+        // Add warning for left brace mismatches
         if (indent > 0) {
             addWarning(FormatterWarnings.WRN_LEFT_BRACE, indent);
         }
+
         log.debug("finished formatting");
     }  
   
@@ -384,7 +410,7 @@ public class Formatter implements IFormatter {
     }
     
     /**
-     * Auxilary method creating indentation string based on block nesting level
+     * Auxiliary method creating indentation string based on block nesting level
      * @param n The block nesting level (number of primitive indents)
      * @return The indentation string
      */

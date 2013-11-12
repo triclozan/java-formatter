@@ -10,9 +10,16 @@ package ru.omsu.ilushechkinea.javaformatter;
  * @author ilushechkinea
  */
 public class FormatterWarningInfo {
+    /** Name (basic text) of the warning -- the only required information */
     private FormatterWarnings warning;
+
+    /** Actual number of warnings this entry describes */
     private int count;
+
+    /** Row where the warning was generated  */
     private int row;
+
+    /** Column where the warning was generated */
     private int column;
     
     public FormatterWarningInfo(FormatterWarnings warning, int count, int row,

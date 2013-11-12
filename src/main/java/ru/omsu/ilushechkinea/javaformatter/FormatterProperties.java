@@ -14,7 +14,11 @@ import java.util.Properties;
     INDENT_SIZE("formatter.indent.size", "4"), 
     INDENT_SYMBOL("formatter.indent.symbol", " "),
     LOGGING_LEVEL("formatter.logging.level", "INFO"); 
+
+    /** Name of the property, key in the .property file */
     private String name;
+
+    /** Default value of the property */
     private String defaultValue;
 
     private FormatterProperties(String name, String defaultValue) {
@@ -22,10 +26,18 @@ import java.util.Properties;
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * Gets property name
+     * @return property name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets property default value
+     * @return property default value
+     */
     public String getDefaultValue() {
         return defaultValue;
     }

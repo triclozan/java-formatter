@@ -21,6 +21,8 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.SettingsIOException;
  */
  public class FormatterSettings {
     static private Logger log = Logger.getLogger(FormatterSettings.class);
+
+    /** Collection of properties mapped to their values */
     private Map<FormatterProperties, String> values;
        
     public FormatterSettings() {
@@ -29,7 +31,12 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.SettingsIOException;
             values.put(property, property.getDefaultValue());
         }
     }
-       
+
+    /**
+     * Loads settings from .property file
+     * @param filename File .property with settings
+     * @throws SettingsIOException
+     */
     public void loadFromFile(String filename) throws SettingsIOException {
         Properties p = new Properties();
 
@@ -46,7 +53,12 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.SettingsIOException;
             setValue(property, p.getProperty(property.getName(), property.getDefaultValue()));
         }
     }
-           
+
+    /**
+     * Saves settings to given file
+     * @param filename Destination file
+     * @throws SettingsIOException
+     */
     public void saveToFile(String filename) throws SettingsIOException {
         Properties p = new Properties();
         for(FormatterProperties property : FormatterProperties.values()){
@@ -63,11 +75,21 @@ import ru.omsu.ilushechkinea.javaformatter.exceptions.SettingsIOException;
             throw new SettingsIOException("Failed to save settings to file " + filename);
         }
     }
-    
+
+    /**
+     * Gets value of given property
+     * @param property Property to get value for
+     * @return value of given property
+     */
     public String getValue(FormatterProperties property){
         return values.get(property);
     }
-    
+
+    /**
+     * Sets specified value for given property
+     * @param property Property to set value for
+     * @param value New value for the property
+     */
     public void setValue(FormatterProperties property, String value) {
         values.put(property, value);
     }
