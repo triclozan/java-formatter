@@ -29,6 +29,9 @@
     <logger name="ru.omsu.ilushechkinea.javaformatter.Formatter">
         <appender-ref ref="file2"/>
     </logger>
+    <logger name="ru.omsu.ilushechkinea.javaformatter.FormatterSettings">
+        <appender-ref ref="file2"/>
+    </logger>
     <logger name="ru.omsu.ilushechkinea.javaformatter.gui.MainForm">
         <appender-ref ref="console"/>
         <appender-ref ref="file"/>

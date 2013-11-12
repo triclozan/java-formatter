@@ -11,14 +11,16 @@ import java.io.InputStream;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
+import ru.omsu.ilushechkinea.javaformatter.exceptions.SettingsIOException;
 
 /**
  * Loads, saves and stores set of formatter settings as a map
  * @author ilushechkinea
  */
  public class FormatterSettings {
+    static private Logger log = Logger.getLogger(FormatterSettings.class);
     private Map<FormatterProperties, String> values;
        
     public FormatterSettings() {
@@ -28,17 +30,24 @@ import java.util.logging.Logger;
         }
     }
        
-    public void loadFromFile(String filename) throws Exception {
+    public void loadFromFile(String filename) throws SettingsIOException {
         Properties p = new Properties();
-        InputStream rs = new FileInputStream(filename);
-        p.load(rs);
-        
+
+        try {
+            InputStream rs = new FileInputStream(filename);
+            p.load(rs);
+        }
+        catch (Exception ex) {
+            log.warn("Failed to load settings from file " + filename);
+            throw new SettingsIOException("Failed to save settings to file " + filename);
+        }
+
         for(FormatterProperties property : FormatterProperties.values()){
             setValue(property, p.getProperty(property.getName(), property.getDefaultValue()));
         }
     }
            
-    public void saveToFile(String filename) {
+    public void saveToFile(String filename) throws SettingsIOException {
         Properties p = new Properties();
         for(FormatterProperties property : FormatterProperties.values()){
             p.setProperty(property.getName(), getValue(property));
@@ -47,14 +56,11 @@ import java.util.logging.Logger;
         try {
             os = new FileOutputStream(filename);
             p.store(os, null);
+            os.close();
         } 
-        catch (IOException ex) {
-        } 
-        finally {
-            try {
-                os.close();
-            } catch (IOException ex) {
-            }
+        catch (Exception ex) {
+            log.warn("Failed to save settings to file " + filename);
+            throw new SettingsIOException("Failed to save settings to file " + filename);
         }
     }
     

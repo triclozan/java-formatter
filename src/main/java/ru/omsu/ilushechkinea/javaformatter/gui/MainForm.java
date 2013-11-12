@@ -37,12 +37,12 @@ public class MainForm extends javax.swing.JFrame {
         log.info("******Application started******");
         initComponents();
         FormatterSettings settings = new FormatterSettings();
+        log.info("******Loading settings******");
         try {
             settings.loadFromFile(System.getProperty("formatter.config.filename", "formatter.properties"));
         }
-        catch(Exception ex) {
+        catch(SettingsIOException ex) {
             JOptionPane.showMessageDialog(this, "Couldn't load settings from file, using default settings", "Warning", WARNING_MESSAGE);
-            log.warn(null, ex);
         }
         formatter = new Formatter(settings);        
     }
@@ -334,14 +334,14 @@ public class MainForm extends javax.swing.JFrame {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+            log.info("******Reloading settings******");
             try {
                 FormatterSettings settings = new FormatterSettings();
                 settings.loadFromFile(fc.getSelectedFile().getAbsolutePath());
                 formatter.setSettings(settings);
             }
-            catch(Exception ex) {
+            catch(SettingsIOException ex) {
                 JOptionPane.showMessageDialog(this, "Couldn't load settings from file, using previous settings", "Warning", WARNING_MESSAGE);
-                log.error(null, ex);
             }
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
