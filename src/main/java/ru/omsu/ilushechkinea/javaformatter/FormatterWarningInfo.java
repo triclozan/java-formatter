@@ -70,9 +70,6 @@ public class FormatterWarningInfo {
         if (other == this) return true;
         if (!(other instanceof FormatterWarningInfo))return false;
         FormatterWarningInfo wi = (FormatterWarningInfo)other;
-        if (wi.count == this.count && wi.warning.equals(this.warning)) {
-            return true;
-        }
-        return false;
+        return wi.count == this.count && wi.warning.equals(this.warning);
     }
 }

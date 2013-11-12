@@ -342,7 +342,7 @@ public class MainForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Couldn't load settings from file, using previous settings", "Warning", WARNING_MESSAGE);
                 log.error(null, ex);
             }
-        };        
+        }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void chooseDirectory(JTextField field) {
@@ -350,7 +350,7 @@ public class MainForm extends javax.swing.JFrame {
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
             field.setText(fc.getSelectedFile().getAbsolutePath());
-        };
+        }
     }    
     /**
      * @param args the command line arguments
